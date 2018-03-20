@@ -1,18 +1,11 @@
 package com.wnlbs.checkposition.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.wnlbs.checkposition.converter.ConverteGaoDeJSONDistrictToCountryProvinceCityDistrictStreet;
-import com.wnlbs.checkposition.dataobject.CountryProvinceCityDistrictStreet;
 import com.wnlbs.checkposition.dataobject.GaoDeJSONFormatBean;
 import com.wnlbs.checkposition.request.PositionRequest;
 import com.wnlbs.checkposition.service.PositionService;
+import com.wnlbs.checkposition.utils.HttpUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.client.HttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +30,9 @@ public class PositionController {
     @Autowired
     private PositionService positionService;
 
+    @Autowired
+    private HttpUtils httpUtils;
+
     /**
      * 获取边界线
      */
@@ -45,30 +41,14 @@ public class PositionController {
     public String getPolyLine(@RequestBody PositionRequest positionRequest) throws Exception {
         //拿到请求对象
         log.info("positionRequest:" + positionRequest.toString());
-        //实例化httpClient
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        String url = String.format(URL, positionRequest.getExtensions(), positionRequest.getKeywords()
-                , positionRequest.getSubdistrict(), positionRequest.getKEY());
-        //实例化get请求
-        HttpGet httpGet = new HttpGet(url);
-        //查看拼接的uri
-        log.info("request url:" + httpGet.getURI());
-        //拿到响应对象实例
-        CloseableHttpResponse response = httpClient.execute(httpGet);
-        //拿到响应内容
-        HttpEntity entity = response.getEntity();
-        String entityString = EntityUtils.toString(entity);
-        log.info("response content:" + entityString);
+        //拿到请求路径
+        String url = httpUtils.getRealUrl(positionRequest);
         //第一步，进入正题，拿到原文的响应对象，并且转化为项目中自己的bean
-        GaoDeJSONFormatBean bean = JSON.parseObject(entityString, GaoDeJSONFormatBean.class);
+        GaoDeJSONFormatBean bean = httpUtils.queryPolyLine(url);
         //TODO 第二步 持久化主类对象进入数据库 单独写方法
-        CountryProvinceCityDistrictStreet cityDistrictStreet =
-                ConverteGaoDeJSONDistrictToCountryProvinceCityDistrictStreet.convert(bean.getDistricts()[0], true, -1);
-        positionService.saveToDB(cityDistrictStreet);
+        positionService.saveToDB(bean,0);
         //TODO 第三步 持久化第二步中的子类对象进入数据库 单独写方法
-
         //TODO 第四步 写入缓存
-
         log.info("bean:" + bean.toString());
         return "OK";
     }

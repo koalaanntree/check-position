@@ -2,12 +2,14 @@ package com.wnlbs.checkposition.request;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @Author: huangxin
  * @Date: Created in 上午9:51 2018/3/20
  * @Description: 定位请求发送主体类
  */
+@ToString
 public class PositionRequest {
     /**
      * 请求秘钥:
