@@ -1,6 +1,6 @@
 package com.wnlbs.checkposition.service;
 
-import com.wnlbs.checkposition.dataobject.GaoDeJSONFormatBean;
+import com.wnlbs.checkposition.rabbit.message.SavePositionMessage;
 
 /**
  * @Author: huangxin
@@ -11,9 +11,9 @@ public interface PositionService {
 
     /**
      * 存入数据库的方法
-     * @param bean
+     * @param savePositionMessage
      * @return
      */
-    boolean saveToDB(GaoDeJSONFormatBean bean,Integer parentId);
+    boolean saveToDB(SavePositionMessage savePositionMessage);
 
 }

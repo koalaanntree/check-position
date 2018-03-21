@@ -1,11 +1,13 @@
 package com.wnlbs.checkposition.controller;
 
 import com.wnlbs.checkposition.dataobject.GaoDeJSONFormatBean;
+import com.wnlbs.checkposition.rabbit.message.SavePositionMessage;
 import com.wnlbs.checkposition.request.PositionRequest;
 import com.wnlbs.checkposition.service.PositionService;
 import com.wnlbs.checkposition.utils.HttpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpClient;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +35,9 @@ public class PositionController {
     @Autowired
     private HttpUtils httpUtils;
 
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+
     /**
      * 获取边界线
      */
@@ -46,7 +51,8 @@ public class PositionController {
         //第一步，进入正题，拿到原文的响应对象，并且转化为项目中自己的bean
         GaoDeJSONFormatBean bean = httpUtils.queryPolyLine(url);
         //TODO 第二步 持久化主类对象进入数据库 单独写方法
-        positionService.saveToDB(bean,0);
+        SavePositionMessage savePositionMessage = new SavePositionMessage(bean,0);
+        amqpTemplate.convertAndSend("check.position","DBData",savePositionMessage);
         //TODO 第三步 持久化第二步中的子类对象进入数据库 单独写方法
         //TODO 第四步 写入缓存
         log.info("bean:" + bean.toString());

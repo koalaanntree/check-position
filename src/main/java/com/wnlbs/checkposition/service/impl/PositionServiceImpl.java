@@ -3,6 +3,7 @@ package com.wnlbs.checkposition.service.impl;
 import com.wnlbs.checkposition.converter.ConverteGaoDeJSONDistrictToCountryProvinceCityDistrictStreet;
 import com.wnlbs.checkposition.dataobject.CountryProvinceCityDistrictStreet;
 import com.wnlbs.checkposition.dataobject.GaoDeJSONFormatBean;
+import com.wnlbs.checkposition.rabbit.message.SavePositionMessage;
 import com.wnlbs.checkposition.repository.CountryProvinceCityDistrictStreetRepository;
 import com.wnlbs.checkposition.request.PositionRequest;
 import com.wnlbs.checkposition.service.PositionService;
@@ -35,12 +36,14 @@ public class PositionServiceImpl implements PositionService {
     /**
      * 迭代方法
      *
-     * @param bean
+     * @param savePositionMessage
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean saveToDB(GaoDeJSONFormatBean bean, Integer parentId) {
+    public boolean saveToDB(SavePositionMessage savePositionMessage) {
+        GaoDeJSONFormatBean bean = savePositionMessage.getGaoDeJSONFormatBean();
+        Integer parentId = savePositionMessage.getParentId();
         //遍历第一遍数据
         for (int i = 0; i < bean.getDistricts().length; i++) {
             boolean havePolyLine = false;
@@ -66,13 +69,14 @@ public class PositionServiceImpl implements PositionService {
                         positionRequest.setKeywords(bean.getDistricts()[i].getDistricts()[j].getName());
                         positionRequest.setSubdistrict(1);
                         positionRequest.setExtensions("all");
-                        positionRequest.setFilter(cityDistrictStreet.getAdcode().substring(0,2)+"0000");
+                        positionRequest.setFilter(cityDistrictStreet.getAdcode().substring(0, 2) + "0000");
                         //拿到请求路径
                         String url = httpUtils.getRealUrl(positionRequest);
                         try {
                             GaoDeJSONFormatBean iteratorBean = httpUtils.queryPolyLine(url);
                             //调用自身saveToDB()
-                            saveToDB(iteratorBean, parentId);
+                            SavePositionMessage iteratorSavePositionMessage = new SavePositionMessage(iteratorBean, parentId);
+                            saveToDB(iteratorSavePositionMessage);
                         } catch (Exception e) {
                             log.info("error:" + positionRequest.toString());
                         }
