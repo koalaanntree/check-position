@@ -24,7 +24,7 @@ public class HttpUtils {
      * GET请求URL路径
      */
     private static final String URL = "http://restapi.amap.com/v3/config/district?" +
-            "extensions=%s&keywords=%s&subdistrict=%s&key=%s";
+            "extensions=%s&keywords=%s&subdistrict=%s&key=%s&filter=%s";
 
     @Autowired
     HttpClient httpClient;
@@ -53,7 +53,7 @@ public class HttpUtils {
      */
     public String getRealUrl(PositionRequest positionRequest) {
         String url = String.format(URL, positionRequest.getExtensions(), positionRequest.getKeywords()
-                , positionRequest.getSubdistrict(), positionRequest.getKEY());
+                , positionRequest.getSubdistrict(), positionRequest.getKEY(),positionRequest.getFilter());
         return url;
     }
 }

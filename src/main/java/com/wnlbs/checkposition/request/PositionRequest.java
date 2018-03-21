@@ -52,4 +52,11 @@ public class PositionRequest {
     @Getter
     @Setter
     private String keywords;
+
+    /**
+     * 过滤关键字filter
+     */
+    @Getter
+    @Setter
+    private String filter;
 }

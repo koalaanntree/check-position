@@ -35,6 +35,11 @@ public class ConverteGaoDeJSONDistrictToCountryProvinceCityDistrictStreet {
         cityDistrictStreet.setName(gaoDeJSONDistrict.getName());
         cityDistrictStreet.setCenter(gaoDeJSONDistrict.getCenter());
         cityDistrictStreet.setLevel(gaoDeJSONDistrict.getLevel());
+        //级别为街道即返回
+        if (cityDistrictStreet.getLevel().equals("street")) {
+            cityDistrictStreet.setPolyline("street have no polyline");
+            return cityDistrictStreet;
+        }
         //如果有边界线
         if (havePolyLine) {
             //存放根目录 确保有

@@ -50,11 +50,12 @@ public class PositionServiceImpl implements PositionService {
             //格式化数据
             CountryProvinceCityDistrictStreet cityDistrictStreet =
                     ConverteGaoDeJSONDistrictToCountryProvinceCityDistrictStreet.convert(bean.getDistricts()[i], havePolyLine, parentId);
-            if (havePolyLine) {
+            if (havePolyLine || cityDistrictStreet.getLevel().equals("street")) {
                 repository.save(cityDistrictStreet);
             }
             //重置parentId
             parentId = cityDistrictStreet.getId();
+            //如果级别为街道的时候终止迭代
             if (!cityDistrictStreet.getLevel().equals("street")) {
                 //迭代
                 if (0 != bean.getDistricts().length) {
@@ -65,6 +66,7 @@ public class PositionServiceImpl implements PositionService {
                         positionRequest.setKeywords(bean.getDistricts()[i].getDistricts()[j].getName());
                         positionRequest.setSubdistrict(1);
                         positionRequest.setExtensions("all");
+                        positionRequest.setFilter(cityDistrictStreet.getAdcode().substring(0,2)+"0000");
                         //拿到请求路径
                         String url = httpUtils.getRealUrl(positionRequest);
                         try {
