@@ -26,12 +26,6 @@ public class PositionController {
     private static final String URL = "http://restapi.amap.com/v3/config/district?" +
             "extensions=%s&keywords=%s&subdistrict=%s&key=%s";
 
-    /**
-     * 拿到数据服务
-     */
-    @Autowired
-    private PositionService positionService;
-
     @Autowired
     private HttpUtils httpUtils;
 
@@ -41,7 +35,7 @@ public class PositionController {
     /**
      * 获取边界线
      */
-    @PostMapping("/polyline")
+    @PostMapping("/initdb")
     @ResponseBody
     public String getPolyLine(@RequestBody PositionRequest positionRequest) throws Exception {
         //拿到请求对象
@@ -50,9 +44,9 @@ public class PositionController {
         String url = httpUtils.getRealUrl(positionRequest);
         //第一步，进入正题，拿到原文的响应对象，并且转化为项目中自己的bean
         GaoDeJSONFormatBean bean = httpUtils.queryPolyLine(url);
-        //TODO 第二步 持久化主类对象进入数据库 单独写方法
-        SavePositionMessage savePositionMessage = new SavePositionMessage(bean,0);
-        amqpTemplate.convertAndSend("check.position","DBData",savePositionMessage);
+        //发送消息到消息队列，利用队列存储数据
+        SavePositionMessage savePositionMessage = new SavePositionMessage(bean, 0);
+        amqpTemplate.convertAndSend("check.position", "DBData", savePositionMessage);
         //TODO 第三步 持久化第二步中的子类对象进入数据库 单独写方法
         //TODO 第四步 写入缓存
         log.info("bean:" + bean.toString());

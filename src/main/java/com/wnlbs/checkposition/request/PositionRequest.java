@@ -31,7 +31,7 @@ public class PositionRequest {
      */
     @Getter
     @Setter
-    private Integer subdistrict;
+    private Integer subdistrict = 1;
     /**
      * 返回结果控制:
      * base:不返回行政区边界坐标点；
