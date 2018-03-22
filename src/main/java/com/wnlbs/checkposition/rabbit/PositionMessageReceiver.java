@@ -19,9 +19,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class PositionMessageReceiver {
 
+    /**
+     * 位置服务
+     */
     @Autowired
     private PositionService positionService;
 
+    /**
+     * 配置队列
+     * @param savePositionMessage
+     */
     @RabbitListener(bindings = @QueueBinding(
             exchange = @Exchange("check.position"),
             key = "DBData",

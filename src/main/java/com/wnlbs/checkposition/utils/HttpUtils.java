@@ -26,6 +26,9 @@ public class HttpUtils {
     private static final String URL = "http://restapi.amap.com/v3/config/district?" +
             "extensions=%s&keywords=%s&subdistrict=%s&key=%s&filter=%s";
 
+    /**
+     * apache httpClient
+     */
     @Autowired
     HttpClient httpClient;
 

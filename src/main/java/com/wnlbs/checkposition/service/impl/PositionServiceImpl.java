@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @Author: huangxin
  * @Date: Created in 下午2:17 2018/3/20
@@ -24,11 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class PositionServiceImpl implements PositionService {
 
-    @Autowired
-    private CountryProvinceCityDistrictStreetRepository repository;
 
     @Autowired
-    private HttpClient httpClient;
+    private CountryProvinceCityDistrictStreetRepository repository;
 
     @Autowired
     private HttpUtils httpUtils;
@@ -90,5 +90,15 @@ public class PositionServiceImpl implements PositionService {
 
 
         return false;
+    }
+
+    @Override
+    public List<CountryProvinceCityDistrictStreet> findByAdcodeStartingWithAndName(String adcode, String name) {
+        return repository.findByAdcodeStartingWithAndName(adcode, name);
+    }
+
+    @Override
+    public List<CountryProvinceCityDistrictStreet> findByParentidAndLevel(Integer parentid, String level) {
+        return repository.findByParentidAndLevel(parentid, level);
     }
 }
