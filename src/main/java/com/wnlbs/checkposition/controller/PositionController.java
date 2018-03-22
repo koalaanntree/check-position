@@ -166,52 +166,52 @@ public class PositionController {
                 boolean b = mapUtils.checkPointIn(centerPonint, generalPath);
                 judgeProvinceSet.add(b);
             }
-            //拼装返回结果省级别
+            //拼装返回结果省级别 当包含进省则轮询
             if (judgeProvinceSet.contains(true)) {
                 log.info("centerPonint : " + centerPonint.toString() + " located in : " + redisProvinceKey);
                 checkResult.setProvince(StringUtils.substringAfter(redisProvinceKey, "province:"));
-            }
-            //拿到当前省份所有市信息
-            List<CountryProvinceCityDistrictStreet> cities = positionService.findByParentidAndLevel(province.getId(), "city");
-            //轮询市
-            for (CountryProvinceCityDistrictStreet city : cities) {
-                //备入缓存 city:湖北省:武汉市
-                String redisCityKey = "city" + ":" + provincesEnum.getProvinceName() + ":" + city.getName();
-                Vector<GeneralPath> generalCityPaths = (Vector<GeneralPath>) redisTemplate.opsForValue().get(redisCityKey);
-                Set<Boolean> judgeCitySet = new HashSet<>();
-                for (GeneralPath generalPath : generalCityPaths) {
-                    boolean b = mapUtils.checkPointIn(centerPonint, generalPath);
-                    judgeCitySet.add(b);
-                }
-                //拼装返回结果市级别
-                if (judgeCitySet.contains(true)) {
-                    log.info("centerPonint : " + centerPonint.toString() + " located in : " + redisCityKey);
-                    checkResult.setCity(StringUtils.substringAfter(redisCityKey, "city" + ":" + provincesEnum.getProvinceName() + ":"));
-                }
-                //拿到当前市所有区县信息
-                List<CountryProvinceCityDistrictStreet> districts = positionService.findByParentidAndLevel(city.getId(), "district");
-                //轮询区县
-                for (CountryProvinceCityDistrictStreet district : districts) {
-                    //备入缓存 district:湖北省:武汉市:昌平区
-                    String redisDistrictKey = "district"
-                            + ":" + provincesEnum.getProvinceName()
-                            + ":" + city.getName()
-                            + ":" + district.getName();
-                    Vector<GeneralPath> generalDistrictPaths = (Vector<GeneralPath>) redisTemplate.opsForValue().get(redisDistrictKey);
-                    Set<Boolean> judgeDistrictSet = new HashSet<>();
-                    for (GeneralPath generalPath : generalDistrictPaths) {
+                //拿到当前省份所有市信息
+                List<CountryProvinceCityDistrictStreet> cities = positionService.findByParentidAndLevel(province.getId(), "city");
+                //轮询市
+                for (CountryProvinceCityDistrictStreet city : cities) {
+                    //备入缓存 city:湖北省:武汉市
+                    String redisCityKey = "city" + ":" + provincesEnum.getProvinceName() + ":" + city.getName();
+                    Vector<GeneralPath> generalCityPaths = (Vector<GeneralPath>) redisTemplate.opsForValue().get(redisCityKey);
+                    Set<Boolean> judgeCitySet = new HashSet<>();
+                    for (GeneralPath generalPath : generalCityPaths) {
                         boolean b = mapUtils.checkPointIn(centerPonint, generalPath);
-                        judgeDistrictSet.add(b);
+                        judgeCitySet.add(b);
                     }
-                    //拼装返回结果区县级别
-                    if (judgeDistrictSet.contains(true)) {
-                        log.info("centerPonint : " + centerPonint.toString() + " located in : " + redisDistrictKey);
-                        checkResult.setDistrict(StringUtils.substringAfter(redisDistrictKey
-                                , "district"
-                                        + ":" + provincesEnum.getProvinceName()
-                                        + ":" + city.getName()
-                                        + ":"));
-                        return checkResult;
+                    //拼装返回结果市级别 当包含进市则轮询
+                    if (judgeCitySet.contains(true)) {
+                        log.info("centerPonint : " + centerPonint.toString() + " located in : " + redisCityKey);
+                        checkResult.setCity(StringUtils.substringAfter(redisCityKey, "city" + ":" + provincesEnum.getProvinceName() + ":"));
+                        //拿到当前市所有区县信息
+                        List<CountryProvinceCityDistrictStreet> districts = positionService.findByParentidAndLevel(city.getId(), "district");
+                        //轮询区县
+                        for (CountryProvinceCityDistrictStreet district : districts) {
+                            //备入缓存 district:湖北省:武汉市:昌平区
+                            String redisDistrictKey = "district"
+                                    + ":" + provincesEnum.getProvinceName()
+                                    + ":" + city.getName()
+                                    + ":" + district.getName();
+                            Vector<GeneralPath> generalDistrictPaths = (Vector<GeneralPath>) redisTemplate.opsForValue().get(redisDistrictKey);
+                            Set<Boolean> judgeDistrictSet = new HashSet<>();
+                            for (GeneralPath generalPath : generalDistrictPaths) {
+                                boolean b = mapUtils.checkPointIn(centerPonint, generalPath);
+                                judgeDistrictSet.add(b);
+                            }
+                            //拼装返回结果区县级别
+                            if (judgeDistrictSet.contains(true)) {
+                                log.info("centerPonint : " + centerPonint.toString() + " located in : " + redisDistrictKey);
+                                checkResult.setDistrict(StringUtils.substringAfter(redisDistrictKey
+                                        , "district"
+                                                + ":" + provincesEnum.getProvinceName()
+                                                + ":" + city.getName()
+                                                + ":"));
+                                return checkResult;
+                            }
+                        }
                     }
                 }
             }
