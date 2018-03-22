@@ -57,8 +57,6 @@ public class PositionController {
         //发送消息到消息队列，利用队列存储数据
         SavePositionMessage savePositionMessage = new SavePositionMessage(bean, 0);
         amqpTemplate.convertAndSend("check.position", "DBData", savePositionMessage);
-        //TODO 第三步 持久化第二步中的子类对象进入数据库 单独写方法
-        //TODO 第四步 写入缓存
         log.info("bean:" + bean.toString());
         return "OK";
     }
@@ -88,7 +86,7 @@ public class PositionController {
             provincePositionBaseData.setCachedKey(province.getName() + province.getLevel() + province.getAdcode());
             provincePositionBaseData.setModelLevel(province.getLevel());
             provincePositionBaseData.setModelName(province.getName());
-            //TODO 拿到单个省的市级数据
+            //拿到单个省的市级数据
             List<CountryProvinceCityDistrictStreet> citylist = positionService.findByParentidAndLevel(province.getId(), "city");
             //处理单个城市的信息
             for (CountryProvinceCityDistrictStreet city : citylist) {
@@ -102,7 +100,7 @@ public class PositionController {
                 cityPositionBaseData.setCachedKey(city.getName() + city.getLevel() + city.getAdcode());
                 cityPositionBaseData.setModelLevel(city.getLevel());
                 cityPositionBaseData.setModelName(city.getName());
-                //TODO 拿到单个市的区级数据
+                //拿到单个市的区级数据
                 List<CountryProvinceCityDistrictStreet> districtList = positionService.findByParentidAndLevel(city.getId(), "district");
                 //处理单个区的信息
                 for (CountryProvinceCityDistrictStreet district : districtList) {
@@ -146,7 +144,7 @@ public class PositionController {
      * 判断是否存在在版图里
      */
     @PostMapping("/checkexist")
-    public CheckResult check(CenterPonint centerPonint) {
+    public CheckResult check(@RequestBody CenterPonint centerPonint) {
         //初始化通用工具
         MapUtils mapUtils = new MapUtils();
         //初始化返回结果
@@ -213,9 +211,9 @@ public class PositionController {
                                         + ":" + provincesEnum.getProvinceName()
                                         + ":" + city.getName()
                                         + ":"));
+                        return checkResult;
                     }
                 }
-
             }
         }
         return checkResult;
