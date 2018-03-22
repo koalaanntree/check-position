@@ -11,11 +11,11 @@ import lombok.Getter;
 public enum ProvincesEnum {
 
     BEIJINGSHI("北京市", "110000"),
+    HUBEISHENG("湖北省", "420000"),
     GUIZHOUSHENG("贵州省", "520000"),
     AOMEN("澳门特别行政区", "820000"),
     FUJIANSHENG("福建省", "350000"),
     CHONGQINGSHI("重庆市", "500000"),
-    HUBEISHENG("湖北省", "420000"),
     HAINANSHENG("海南省", "460000"),
     GUANGDONGSHENG("广东省", "440000"),
     GUANGXISHENG("广西壮族自治区", "450000"),
