@@ -1,7 +1,10 @@
 package com.wnlbs.checkposition.converter;
 
+import com.wnlbs.checkposition.config.PositionProperties;
 import com.wnlbs.checkposition.dataobject.CountryProvinceCityDistrictStreet;
 import com.wnlbs.checkposition.dataobject.GaoDeJSONDistrict;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -12,7 +15,11 @@ import java.io.IOException;
  * @Date: Created in 下午1:15 2018/3/20
  * @Description:
  */
+@Component
 public class ConverteGaoDeJSONDistrictToCountryProvinceCityDistrictStreet {
+
+    @Autowired
+    PositionProperties positionProperties;
 
     /**
      * 转化数据为国家、省份、城市、区县、街道
@@ -22,7 +29,7 @@ public class ConverteGaoDeJSONDistrictToCountryProvinceCityDistrictStreet {
      * @param parentId          上级id 如果没有填-1
      * @return
      */
-    public static CountryProvinceCityDistrictStreet convert(GaoDeJSONDistrict gaoDeJSONDistrict, boolean havePolyLine, Integer parentId) {
+    public CountryProvinceCityDistrictStreet convert(GaoDeJSONDistrict gaoDeJSONDistrict, boolean havePolyLine, Integer parentId) {
         //实例化对象
         CountryProvinceCityDistrictStreet cityDistrictStreet = new CountryProvinceCityDistrictStreet();
         //是否有parentId
@@ -43,7 +50,7 @@ public class ConverteGaoDeJSONDistrictToCountryProvinceCityDistrictStreet {
         //如果有边界线
         if (havePolyLine) {
             //存放根目录 确保有
-            String rootPath = "/Users/huangxin/Desktop/demoprojects/check-position/src/main/resources/doc/polyline";
+            String rootPath = positionProperties.getPath();
             //待生成文件夹 国家、省份、城市、区县、街道
             String dirName = gaoDeJSONDistrict.getLevel();
             //待生成文件名 eg:110000北京市.txt

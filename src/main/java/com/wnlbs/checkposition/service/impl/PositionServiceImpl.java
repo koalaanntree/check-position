@@ -33,6 +33,9 @@ public class PositionServiceImpl implements PositionService {
     @Autowired
     private HttpUtils httpUtils;
 
+    @Autowired
+    private ConverteGaoDeJSONDistrictToCountryProvinceCityDistrictStreet converteGaoDeJSONDistrictToCountryProvinceCityDistrictStreet;
+
     /**
      * 迭代方法
      *
@@ -52,14 +55,21 @@ public class PositionServiceImpl implements PositionService {
             }
             //格式化数据
             CountryProvinceCityDistrictStreet cityDistrictStreet =
-                    ConverteGaoDeJSONDistrictToCountryProvinceCityDistrictStreet.convert(bean.getDistricts()[i], havePolyLine, parentId);
-            if (havePolyLine || cityDistrictStreet.getLevel().equals("street")) {
+                    converteGaoDeJSONDistrictToCountryProvinceCityDistrictStreet.convert(bean.getDistricts()[i], havePolyLine, parentId);
+            //暂时不存街道信息
+            if (cityDistrictStreet.getLevel().equals("street")) {
+                return false;
+            }
+            if (havePolyLine
+                //暂时不存街道信息
+//                    || cityDistrictStreet.getLevel().equals("street")
+                    ) {
                 repository.save(cityDistrictStreet);
             }
             //重置parentId
             parentId = cityDistrictStreet.getId();
             //如果级别为街道的时候终止迭代
-            if (!cityDistrictStreet.getLevel().equals("street")) {
+            if (!cityDistrictStreet.getLevel().equals("district")) {
                 //迭代
                 if (0 != bean.getDistricts().length) {
                     //内部循环
