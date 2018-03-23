@@ -130,8 +130,6 @@ public class MapUtils {
         for (List<EdgePoint> edgePointList : edgePoints) {
             GeneralPath generalPath = genGraphEdge(edgePointList);
             generalPaths.addElement(generalPath);
-            GeneralPath gp9 = genGraphEdge(edgePointList);
-            generalPaths.addElement(gp9);
         }
         return generalPaths;
     }
